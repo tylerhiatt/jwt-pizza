@@ -6,11 +6,11 @@ As part of `Deliverable ⓵ Development deployment: JWT Pizza`, start up the app
 
 | User activity                                       | Frontend component | Backend endpoints | Database SQL |
 | --------------------------------------------------- | ------------------ | ----------------- | ------------ |
-| View home page                                      |                    |                   |              |
-| Register new user<br/>(t@jwt.com, pw: test)         |                    |                   |              |
-| Login new user<br/>(t@jwt.com, pw: test)            |                    |                   |              |
-| Order pizza                                         |                    |                   |              |
-| Verify pizza                                        |                    |                   |              |
+| View home page                                      |     home.tsx       |      _none_       |    _none_    |
+| Register new user<br/>(t@jwt.com, pw: test)         |    register.tsx    | [POST] /api/auth  | INSERT INTO user (name, email, password) VALUES (?, ?, ?)<br/>INSERT INTO userRole (userId, role, objectId) VALUES (?, ?, ?) |
+| Login new user<br/>(t@jwt.com, pw: test)            |     login.tsx      |  [PUT] /api/auth  | INSERT INTO auth (token, userId) VALUES (?, ?) |
+| Order pizza                                         |     menu.tsx       | [POST] /api/order | INSERT INTO dinerOrder (dinerId, franchiseId, storeId, date) VALUES (?, ?, ?, now())<br/>INSERT INTO orderItem (orderId, menuId, description, price) VALUES (?, ?, ?, ?) |
+| Verify pizza                                        |    delivery.tsx    | [POST] /api/order/verify |  _none_ (Request is verified via pizza factory, not in pizza service db) |
 | View profile page                                   |                    |                   |              |
 | View franchise<br/>(as diner)                       |                    |                   |              |
 | Logout                                              |                    |                   |              |
