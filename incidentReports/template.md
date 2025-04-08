@@ -1,134 +1,85 @@
-# Incident: YYYY-MM-DD HH-mm-ss
+# Incident: 2025-04-08 9:21:00
 
 ## Summary
 
-> [!NOTE]
-> Write a summary of the incident in a few sentences. Include what happened, why, the severity of the incident and how long the impact lasted.
-
 ```md
-**EXAMPLE**:
+Between the hour of 9:21 and 11:57 MST on April 8th, 2025, all users experienced failures when attempting to place pizza orders through the JWT Pizza application.. The event was triggered by a chaos testing injection at 9:21. During the chaos window, the /api/order endpoint began returning 500 Internal Server Errors with the message "Failed to fulfill order at factory."
 
-Between the hour of {time range of incident, e.g. 15:45 and 16:35} on {DATE}, {NUMBER} users encountered {EVENT SYMPTOMS}. The event was triggered by a {CHANGE} at {TIME OF CHANGE THAT CAUSED THE EVENT}. The {CHANGE} contained {DESCRIPTION OF OR REASON FOR THE CHANGE, such as a change in code to update a system}.
-
-A bug in this code caused {DESCRIPTION OF THE PROBLEM}. The event was detected by {MONITORING SYSTEM}. The team started working on the event by {RESOLUTION ACTIONS TAKEN}. This {SEVERITY LEVEL} incident affected {X%} of users.
-
-There was further impact as noted by {e.g. NUMBER OF SUPPORT TICKETS SUBMITTED, SOCIAL MEDIA MENTIONS, CALLS TO ACCOUNT MANAGERS} were raised in relation to this incident.
+This high-severity incident prevented successful order processing and resulted in revenue loss and user-facing failures for the duration of the issue. It was resolved once the recovery URL provided in the error log was visited to report and fix the failure in the pizza factory simulation service. This high-severity incident affected 100% of users during this window.
 ```
 
 ## Detection
 
-> [!NOTE]
-> When did the team detect the incident? How did they know it was happening? How could we improve time-to-detection? Consider: How would we have cut that time by half?
-
 ```md
-**EXAMPLE**:
+This incident was detected when the Pizza Purchase Failure alert was triggered and the JWT Pizza DevOps team was paged. This alert was ultimately triggered due to a spike in 500-level HTTP error logs in the Grafana Logs panel, specifically on the /api/order route. The metrics showed revenue dropping to 0 and pizza failure counts increasing, triggering the alerts in the "Pizzas Purchases" dashboard
 
-This incident was detected when the {ALERT TYPE} was triggered and {TEAM/PERSON} were paged.
-
-Next, {SECONDARY PERSON} was paged, because {FIRST PERSON} didn't own the service writing to the disk, delaying the response by {XX MINUTES/HOURS}.
-
-{DESCRIBE THE IMPROVEMENT} will be set up by {TEAM OWNER OF THE IMPROVEMENT} so that {EXPECTED IMPROVEMENT}.
+The team improved detection time by including detailed error logs and enabling logging of the factory's report URL, which was instrumental in the resolution.
 ```
 
 ## Impact
 
-> [!NOTE]
-> Describe how the incident impacted internal and external users during the incident. Include how many support cases were raised.
-
 ```md
-**EXAMPLE**:
+For 2 hours and 37 minutes between 09:21 and 11:57 MST on 04/08/25, users were unable to place pizza orders through the JWT Pizza application due to factory failures.
 
-For {XXhrs XX minutes} between {XX:XX UTC and XX:XX UTC} on {MM/DD/YY}, {SUMMARY OF INCIDENT} our users experienced this incident.
-
-This incident affected {XX} customers (X% OF {SYSTEM OR SERVICE} USERS), who experienced {DESCRIPTION OF SYMPTOMS}.
-
-{XX NUMBER OF SUPPORT TICKETS AND XX NUMBER OF SOCIAL MEDIA POSTS} were submitted.
+This incident affected all users attempting to place orders, leading to a 100% drop in revenue and a spike in pizza creation failure metrics. No external support tickets were submitted due to the internal nature of the test, but internal monitoring and alerts were triggered.
 ```
 
 ## Timeline
 
-> [!NOTE]
-> Detail the incident timeline. We recommend using UTC to standardize for timezones.
-> Include any notable lead-up events, any starts of activity, the first known impact, and escalations. Note any decisions or changed made, and when the incident ended, along with any post-impact events of note.
-
 ```md
-**EXAMPLE**:
+All times are MST.
 
-All times are UTC.
+09:21 - Chaos test begins. Pizza orders begin failing.
 
-- _11:48_ - K8S 1.9 upgrade of control plane is finished
-- _12:46_ - Upgrade to V1.9 completed, including cluster-auto scaler and the BuildEng scheduler instance
-- _14:20_ - Build Engineering reports a problem to the KITT Disturbed
-- _14:27_ - KITT Disturbed starts investigating failures of a specific EC2 instance (ip-203-153-8-204)
-- _14:42_ - KITT Disturbed cordons the node
-- _14:49_ - BuildEng reports the problem as affecting more than just one node. 86 instances of the problem show failures are more systemic
-- _15:00_ - KITT Disturbed suggests switching to the standard scheduler
-- _15:34_ - BuildEng reports 200 pods failed
-- _16:00_ - BuildEng kills all failed builds with OutOfCpu reports
-- _16:13_ - BuildEng reports the failures are consistently recurring with new builds and were not just transient.
-- _16:30_ - KITT recognize the failures as an incident and run it as an incident.
-- _16:36_ - KITT disable the Escalator autoscaler to prevent the autoscaler from removing compute to alleviate the problem.
-- _16:40_ - KITT confirms ASG is stable, cluster load is normal and customer impact resolved.
+09:22 - Alert fires for spike in pizza creation failures.
+
+09:23 - Alert fires for drop in revenue.
+
+09:25 - Investigation begins. Logs for /api/order show repeated 500 errors.
+
+11:55 - Report URL was extracted from error log.
+
+11:56 - Visiting reportUrl initiates factory recovery.
+
+11:57 - Orders begin succeeding again.
+
+11:58 - Metrics stabilize and revenue resumes.
 ```
 
 ## Response
 
-> [!NOTE]
-> Who responded to the incident? When did they respond, and what did they do? Note any delays or obstacles to responding.
-
 ```md
-**EXAMPLE**:
-
-After receiving a page at {XX:XX UTC}, {ON-CALL ENGINEER} came online at {XX:XX UTC} in {SYSTEM WHERE INCIDENT INFO IS CAPTURED}.
-
-This engineer did not have a background in the {AFFECTED SYSTEM} so a second alert was sent at {XX:XX UTC} to {ESCALATIONS ON-CALL ENGINEER} into the who came into the room at {XX:XX UTC}.
+After receiving automated alerts at 09:22 MST, the on-call devOps engineer on the JWT Pizza DevOps team began investigating at 09:25 MST. After a few failed attempts at trying to fix the error, including changing the Logs to identify the message body, the engineer examined the fixed Logs panel and identified the consistent error message "Failed to fulfill order at factory." The log also included a URL, which was visited to trigger a recovery routine in the simulated factory service. This action was finally restored service by 11:57 MST.
 ```
 
 ## Root cause
 
-> [!NOTE]
-> Note the final root cause of the incident, the thing identified that needs to change in order to prevent this class of incident from happening again.
-
 ```md
-**EXAMPLE**:
-
-A bug in connection pool handling led to leaked connections under failure conditions, combined with lack of visibility into connection state.
+The root cause was an intentional chaos test injection that disabled the ability for the factory service to fulfill pizza orders. The test was designed to simulate factory-level service outages.
 ```
 
 ## Resolution
 
-> [!NOTE]
-> Describe how the service was restored and the incident was deemed over. Detail how the service was successfully restored and you knew how what steps you needed to take to recovery.
-> Depending on the scenario, consider these questions: How could you improve time to mitigation? How could you have cut that time by half?
-
 ```md
-**EXAMPLE**:
-By Increasing the size of the BuildEng EC3 ASG to increase the number of nodes available to support the workload and reduce the likelihood of scheduling on oversubscribed nodes
+The issue was resolved by using the report URL provided in the error response body. This manual recovery action triggered the factory to resume fulfilling orders.
 
-Disabled the Escalator autoscaler to prevent the cluster from aggressively scaling-down
-Reverting the Build Engineering scheduler to the previous version.
+No code changes were required. The resolution also validated that proper logging and metric instrumentation were in place. The alerting was in place to let the on-call engineer know that pizza failures were occuring and the revenue dropped.
 ```
 
 ## Prevention
 
-> [!NOTE]
-> Now that you know the root cause, can you look back and see any other incidents that could have the same root cause? If yes, note what mitigation was attempted in those incidents and ask why this incident occurred again.
-
 ```md
-**EXAMPLE**:
+The system behaved as expected during chaos testing. However, the root cause revealed that only manual intervention via the report URL resolves the issue.
 
-This same root cause resulted in incidents HOT-13432, HOT-14932 and HOT-19452.
+In future chaos events, clearer alert messages, better logs, and an automated report URL trigger system could improve resolution time.
 ```
 
 ## Action items
 
-> [!NOTE]
-> Describe the corrective action ordered to prevent this class of incident in the future. Note who is responsible and when they have to complete the work and where that work is being tracked.
-
 ```md
-**EXAMPLE**:
+1. Add automation to visit factory report URL for known chaos test errors (Owner: DevOps, Due: 04/15/25)
 
-1. Manual auto-scaling rate limit put in place temporarily to limit failures
-1. Unit test and re-introduction of job rate limiting
-1. Introduction of a secondary mechanism to collect distributed rate information across cluster to guide scaling effects
+2. Enhance alert messaging to reference the report URL pattern when factory errors are detected (Owner: DevOps, Due: 04/15/25)
+
+3. Document chaos resolution procedure in the internal runbook (Owner: DevOps, Due: 04/15/25)
 ```
